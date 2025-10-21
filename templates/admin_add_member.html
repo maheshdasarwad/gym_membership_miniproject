@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Member - MKC Fitness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .add-member-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .add-member-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .add-member-header h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .add-member-header p {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+
+    .form-container {
+      background: var(--dark-card);
+      padding: 3rem;
+      border-radius: 30px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: var(--gradient);
+      border-radius: 30px;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .form-container:hover::before {
+      opacity: 0.1;
+    }
+
+    .form-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: var(--gradient);
+      transition: width 0.3s ease;
+    }
+
+    .form-section {
+      margin-bottom: 3rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-icon {
+      font-size: 2rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 2rem;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: var(--dark-alt);
+      border: 2px solid rgba(0, 255, 136, 0.2);
+      border-radius: 15px;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-group select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300ff88' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1.5rem center;
+      padding-right: 3rem;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding: 1rem 1.5rem;
+      background: var(--dark-alt);
+      border: 2px solid rgba(0, 255, 136, 0.2);
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      flex: 1;
+    }
+
+    .radio-option:hover {
+      border-color: var(--primary);
+      background: rgba(0, 255, 136, 0.05);
+    }
+
+    .radio-option.selected {
+      border-color: var(--primary);
+      background: rgba(0, 255, 136, 0.1);
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+    }
+
+    .radio-option input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+    .radio-option label {
+      margin: 0;
+      cursor: pointer;
+      color: var(--text);
+      text-transform: none;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .trainer-section {
+      transition: all 0.4s ease;
+      max-height: 200px;
+      opacity: 1;
+      overflow: hidden;
+    }
+
+    .trainer-section.hidden {
+      max-height: 0;
+      opacity: 0;
+      margin-bottom: 0;
+      pointer-events: none;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 1.2rem 2rem;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: var(--dark);
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-primary:hover::before {
+      width: 400px;
+      height: 400px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 255, 136, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 20px rgba(0, 255, 136, 0.2);
+    }
+
+    .error {
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 10px rgba(255, 71, 87, 0.3) !important;
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    @media (max-width: 768px) {
+      .add-member-container {
+        padding: 1rem;
+      }
+
+      .form-container {
+        padding: 2rem 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .radio-group {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+
+  <div class="add-member-container">
+    <div class="add-member-header">
+      <h1>✨ Add New Member ✨</h1>
+      <p>Register a new member to the gym</p>
+    </div>
+
+    <div class="form-container">
+      <div class="form-progress"></div>
+
+      <form method="POST" id="memberForm">
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <div class="section-title">
+            <span class="section-icon">👤</span>
+            Personal Information
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Full Name *</label>
+              <input type="text" id="name" name="name" required>
+              <div class="error-message" id="nameError">Please enter a valid name</div>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email">
+              <div class="error-message" id="emailError">Please enter a valid email</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input type="tel" id="phone" name="phone">
+              <div class="error-message" id="phoneError">Please enter a valid phone number</div>
+            </div>
+            <div class="form-group">
+              <label for="age">Age *</label>
+              <input type="number" id="age" name="age" min="10" max="100" required>
+              <div class="error-message" id="ageError">Age must be between 10 and 100</div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="weight">Weight (kg) *</label>
+              <input type="number" id="weight" name="weight" step="0.1" min="20" max="300" required>
+              <div class="error-message" id="weightError">Weight must be between 20kg and 300kg</div>
+            </div>
+            <div class="form-group">
+              <label for="height">Height (cm) *</label>
+              <input type="number" id="height" name="height" step="0.1" min="100" max="250" required>
+              <div class="error-message" id="heightError">Height must be between 100cm and 250cm</div>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="address">Address</label>
+            <textarea id="address" name="address" placeholder="Enter member's address"></textarea>
+          </div>
+        </div>
+
+        <!-- Emergency Contact Section -->
+        <div class="form-section">
+          <div class="section-title">
+            <span class="section-icon">🚨</span>
+            Emergency Contact
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="emergency_contact">Emergency Contact Name</label>
+              <input type="text" id="emergency_contact" name="emergency_contact">
+            </div>
+            <div class="form-group">
+              <label for="emergency_phone">Emergency Contact Phone</label>
+              <input type="tel" id="emergency_phone" name="emergency_phone">
+            </div>
+          </div>
+        </div>
+
+        <!-- Membership Information Section -->
+        <div class="form-section">
+          <div class="section-title">
+            <span class="section-icon">💳</span>
+            Membership Information
+          </div>
+
+          <div class="form-group">
+            <label for="plan_id">Membership Plan *</label>
+            <select id="plan_id" name="plan_id" required>
+              <option value="">Select a membership plan</option>
+              {% for plan in plans %}
+              <option value="{{ plan.plan_id }}" data-price="{{ plan.price }}" data-trainer-price="{{ plan.trainer_price }}">
+                {{ plan.plan_name }} - ₹{{ plan.price }}{% if plan.trainer_price %} (+ ₹{{ plan.trainer_price }} for trainer){% endif %}
+              </option>
+              {% endfor %}
+            </select>
+            <div class="error-message" id="plan_idError">Please select a membership plan</div>
+          </div>
+
+          <div class="form-group">
+            <label for="reason">Reason to Join *</label>
+            <textarea id="reason" name="reason" placeholder="What are your fitness goals? (e.g., weight loss, muscle gain, general fitness)" required></textarea>
+            <div class="error-message" id="reasonError">Please describe your fitness goals</div>
+          </div>
+
+          <div class="form-group">
+            <label>Do you need a Personal Trainer?</label>
+            <div class="radio-group">
+              <div class="radio-option" id="trainerYesOption">
+                <input type="radio" name="trainer_required" id="trainer_yes" value="yes">
+                <label for="trainer_yes">✅ Yes, I want a trainer</label>
+              </div>
+              <div class="radio-option selected" id="trainerNoOption">
+                <input type="radio" name="trainer_required" id="trainer_no" value="no" checked>
+                <label for="trainer_no">❌ No, I'll train myself</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group trainer-section hidden" id="trainerSection">
+            <label for="trainer_id">Choose Your Trainer</label>
+            <select id="trainer_id" name="trainer_id">
+              <option value="">Select a trainer</option>
+              {% for trainer in trainers %}
+              <option value="{{ trainer.trainer_id }}">{{ trainer.name }} - {{ trainer.speciality }} ({{ trainer.experience }} years exp)</option>
+              {% endfor %}
+            </select>
+            <div class="error-message" id="trainer_idError">Please select a trainer</div>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button type="submit" class="btn btn-primary">🚀 Add Member</button>
+          <a href="{{ url_for('admin_members') }}" class="btn btn-secondary">🏠 Back to Members</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Trainer selection logic
+    const trainerYesOption = document.getElementById('trainerYesOption');
+    const trainerNoOption = document.getElementById('trainerNoOption');
+    const trainerYesRadio = document.getElementById('trainer_yes');
+    const trainerNoRadio = document.getElementById('trainer_no');
+    const trainerSection = document.getElementById('trainerSection');
+    const trainerSelect = document.getElementById('trainer_id');
+
+    function showTrainerSection() {
+      trainerYesRadio.checked = true;
+      trainerYesOption.classList.add('selected');
+      trainerNoOption.classList.remove('selected');
+      trainerSection.classList.remove('hidden');
+      trainerSelect.setAttribute('required', 'required');
+    }
+
+    function hideTrainerSection() {
+      trainerNoRadio.checked = true;
+      trainerNoOption.classList.add('selected');
+      trainerYesOption.classList.remove('selected');
+      trainerSection.classList.add('hidden');
+      trainerSelect.removeAttribute('required');
+      trainerSelect.value = '';
+    }
+
+    trainerYesOption.addEventListener('click', showTrainerSection);
+    trainerNoOption.addEventListener('click', hideTrainerSection);
+    trainerYesRadio.addEventListener('change', function() {
+      if (this.checked) showTrainerSection();
+    });
+    trainerNoRadio.addEventListener('change', function() {
+      if (this.checked) hideTrainerSection();
+    });
+
+    // Form validation and progress
+    const form = document.getElementById('memberForm');
+    const allInputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+    const progress = document.querySelector('.form-progress');
+
+    function updateProgress() {
+      let filled = 0;
+      let totalToCount = 0;
+      
+      allInputs.forEach(input => {
+        if (input.id === 'trainer_id' && trainerSection.classList.contains('hidden')) {
+          return;
+        }
+        totalToCount++;
+        if (input.value.trim() !== '') filled++;
+      });
+      
+      const percentage = totalToCount > 0 ? (filled / totalToCount) * 100 : 0;
+      progress.style.width = percentage + '%';
+    }
+
+    allInputs.forEach(input => {
+      input.addEventListener('input', updateProgress);
+      input.addEventListener('change', updateProgress);
+    });
+
+    // Validation functions
+    function validateField(input, errorElement, validationFn) {
+      const isValid = validationFn(input.value);
+      if (!isValid && input.value.trim() !== '') {
+        input.classList.add('error');
+        errorElement.classList.add('show');
+      } else {
+        input.classList.remove('error');
+        errorElement.classList.remove('show');
+      }
+      return isValid;
+    }
+
+    const validations = {
+      name: (value) => value.trim().length >= 2,
+      email: (value) => {
+        if (!value) return true; // Optional field
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+      },
+      phone: (value) => {
+        if (!value) return true; // Optional field
+        return /^[\+]?[0-9\s\-\(\)]{10,}$/.test(value);
+      },
+      age: (value) => {
+        const age = parseInt(value);
+        return !isNaN(age) && age >= 10 && age <= 100;
+      },
+      weight: (value) => {
+        const weight = parseFloat(value);
+        return !isNaN(weight) && weight >= 20 && weight <= 300;
+      },
+      height: (value) => {
+        const height = parseFloat(value);
+        return !isNaN(height) && height >= 100 && height <= 250;
+      },
+      plan_id: (value) => value.trim() !== '',
+      reason: (value) => value.trim().length >= 10,
+      trainer_id: (value) => {
+        if (trainerSection.classList.contains('hidden')) return true;
+        return value.trim() !== '';
+      }
+    };
+
+    form.addEventListener('input', function(e) {
+      const input = e.target;
+      const fieldName = input.name;
+      
+      if (validations[fieldName]) {
+        const errorElement = document.getElementById(fieldName + 'Error');
+        if (errorElement) {
+          validateField(input, errorElement, validations[fieldName]);
+        }
+      }
+      
+      updateProgress();
+    });
+
+    form.addEventListener('submit', function(e) {
+      let isValid = true;
+      
+      document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+      document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+      
+      allInputs.forEach(input => {
+        if (input.id === 'trainer_id' && trainerSection.classList.contains('hidden')) {
+          return;
+        }
+        
+        const fieldName = input.name;
+        const errorElement = document.getElementById(fieldName + 'Error');
+        
+        if (errorElement && validations[fieldName]) {
+          const fieldIsValid = validateField(input, errorElement, validations[fieldName]);
+          if (!fieldIsValid) isValid = false;
+        }
+      });
+      
+      if (!isValid) {
+        e.preventDefault();
+        const firstError = document.querySelector('.error');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    });
+
+    // Add floating particles
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.style.position = 'fixed';
+      particle.style.width = Math.random() * 4 + 2 + 'px';
+      particle.style.height = particle.style.width;
+      particle.style.background = 'var(--primary)';
+      particle.style.borderRadius = '50%';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = '100%';
+      particle.style.opacity = '0.3';
+      particle.style.pointerEvents = 'none';
+      particle.style.zIndex = '1';
+      document.body.appendChild(particle);
+
+      const duration = Math.random() * 3 + 3;
+      const drift = (Math.random() - 0.5) * 100;
+
+      particle.animate([
+        { transform: 'translateY(0) translateX(0)', opacity: 0.3 },
+        { transform: `translateY(-100vh) translateX(${drift}px)`, opacity: 0 }
+      ], {
+        duration: duration * 1000,
+        easing: 'ease-out'
+      }).onfinish = () => particle.remove();
+    }
+
+    setInterval(createParticle, 500);
+  </script>
+</body>
+</html>

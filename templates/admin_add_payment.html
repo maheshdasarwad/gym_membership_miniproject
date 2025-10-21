@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Payment - MKC Fitness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .add-payment-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .add-payment-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .add-payment-header h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .add-payment-header p {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+
+    .form-container {
+      background: var(--dark-card);
+      padding: 3rem;
+      border-radius: 30px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: var(--gradient);
+      border-radius: 30px;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .form-container:hover::before {
+      opacity: 0.1;
+    }
+
+    .form-group {
+      margin-bottom: 2rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: var(--dark-alt);
+      border: 2px solid rgba(0, 255, 136, 0.2);
+      border-radius: 15px;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-group select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300ff88' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1.5rem center;
+      padding-right: 3rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 1.2rem 2rem;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: var(--dark);
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-primary:hover::before {
+      width: 400px;
+      height: 400px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 255, 136, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 20px rgba(0, 255, 136, 0.2);
+    }
+
+    .error {
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 10px rgba(255, 71, 87, 0.3) !important;
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .member-info {
+      background: rgba(0, 255, 136, 0.1);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .member-info h4 {
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .member-info p {
+      color: var(--text-dim);
+      margin: 0.25rem 0;
+    }
+
+    @media (max-width: 768px) {
+      .add-payment-container {
+        padding: 1rem;
+      }
+
+      .form-container {
+        padding: 2rem 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+
+  <div class="add-payment-container">
+    <div class="add-payment-header">
+      <h1>💰 Add Payment</h1>
+      <p>Record a new payment for a member</p>
+    </div>
+
+    <div class="form-container">
+      <form method="POST" id="paymentForm">
+        <div class="form-group">
+          <label for="member_id">Select Member *</label>
+          <select id="member_id" name="member_id" required onchange="showMemberInfo()">
+            <option value="">Choose a member</option>
+            {% for member in members %}
+            <option value="{{ member.member_id }}" data-name="{{ member.name }}" data-plan="{{ member.membership_plan }}">
+              {{ member.name }} - {{ member.membership_plan }}
+            </option>
+            {% endfor %}
+          </select>
+          <div class="error-message" id="member_idError">Please select a member</div>
+        </div>
+
+        <div id="memberInfo" class="member-info" style="display: none;">
+          <h4>Member Information</h4>
+          <p><strong>Name:</strong> <span id="memberName"></span></p>
+          <p><strong>Plan:</strong> <span id="memberPlan"></span></p>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="amount">Amount (₹) *</label>
+            <input type="number" id="amount" name="amount" step="0.01" min="0" required>
+            <div class="error-message" id="amountError">Please enter a valid amount</div>
+          </div>
+          <div class="form-group">
+            <label for="payment_type">Payment Type *</label>
+            <select id="payment_type" name="payment_type" required>
+              <option value="">Select type</option>
+              <option value="membership">Membership</option>
+              <option value="trainer">Trainer</option>
+              <option value="class">Class</option>
+              <option value="equipment">Equipment</option>
+              <option value="other">Other</option>
+            </select>
+            <div class="error-message" id="payment_typeError">Please select a payment type</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="payment_method">Payment Method *</label>
+            <select id="payment_method" name="payment_method" required>
+              <option value="">Select method</option>
+              <option value="cash">Cash</option>
+              <option value="card">Card</option>
+              <option value="upi">UPI</option>
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="cheque">Cheque</option>
+            </select>
+            <div class="error-message" id="payment_methodError">Please select a payment method</div>
+          </div>
+          <div class="form-group">
+            <label for="payment_status">Payment Status *</label>
+            <select id="payment_status" name="payment_status" required>
+              <option value="">Select status</option>
+              <option value="completed">Completed</option>
+              <option value="pending">Pending</option>
+              <option value="failed">Failed</option>
+              <option value="refunded">Refunded</option>
+            </select>
+            <div class="error-message" id="payment_statusError">Please select a payment status</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Notes</label>
+          <textarea id="notes" name="notes" placeholder="Additional notes about this payment..."></textarea>
+        </div>
+
+        <div class="button-group">
+          <button type="submit" class="btn btn-primary">💰 Add Payment</button>
+          <a href="{{ url_for('admin_payments') }}" class="btn btn-secondary">← Back to Payments</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function showMemberInfo() {
+      const memberSelect = document.getElementById('member_id');
+      const memberInfo = document.getElementById('memberInfo');
+      const memberName = document.getElementById('memberName');
+      const memberPlan = document.getElementById('memberPlan');
+
+      if (memberSelect.value) {
+        const selectedOption = memberSelect.options[memberSelect.selectedIndex];
+        memberName.textContent = selectedOption.dataset.name;
+        memberPlan.textContent = selectedOption.dataset.plan;
+        memberInfo.style.display = 'block';
+      } else {
+        memberInfo.style.display = 'none';
+      }
+    }
+
+    // Form validation
+    const form = document.getElementById('paymentForm');
+    const allInputs = form.querySelectorAll('input[required], select[required]');
+
+    function validateField(input, errorElement, validationFn) {
+      const isValid = validationFn(input.value);
+      if (!isValid && input.value.trim() !== '') {
+        input.classList.add('error');
+        errorElement.classList.add('show');
+      } else {
+        input.classList.remove('error');
+        errorElement.classList.remove('show');
+      }
+      return isValid;
+    }
+
+    const validations = {
+      member_id: (value) => value.trim() !== '',
+      amount: (value) => {
+        const amount = parseFloat(value);
+        return !isNaN(amount) && amount > 0;
+      },
+      payment_type: (value) => value.trim() !== '',
+      payment_method: (value) => value.trim() !== '',
+      payment_status: (value) => value.trim() !== ''
+    };
+
+    form.addEventListener('input', function(e) {
+      const input = e.target;
+      const fieldName = input.name;
+      
+      if (validations[fieldName]) {
+        const errorElement = document.getElementById(fieldName + 'Error');
+        if (errorElement) {
+          validateField(input, errorElement, validations[fieldName]);
+        }
+      }
+    });
+
+    form.addEventListener('submit', function(e) {
+      let isValid = true;
+      
+      document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+      document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+      
+      allInputs.forEach(input => {
+        const fieldName = input.name;
+        const errorElement = document.getElementById(fieldName + 'Error');
+        
+        if (errorElement && validations[fieldName]) {
+          const fieldIsValid = validateField(input, errorElement, validations[fieldName]);
+          if (!fieldIsValid) isValid = false;
+        }
+      });
+      
+      if (!isValid) {
+        e.preventDefault();
+        const firstError = document.querySelector('.error');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    });
+
+    // Add floating particles
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.style.position = 'fixed';
+      particle.style.width = Math.random() * 4 + 2 + 'px';
+      particle.style.height = particle.style.width;
+      particle.style.background = 'var(--primary)';
+      particle.style.borderRadius = '50%';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = '100%';
+      particle.style.opacity = '0.3';
+      particle.style.pointerEvents = 'none';
+      particle.style.zIndex = '1';
+      document.body.appendChild(particle);
+
+      const duration = Math.random() * 3 + 3;
+      const drift = (Math.random() - 0.5) * 100;
+
+      particle.animate([
+        { transform: 'translateY(0) translateX(0)', opacity: 0.3 },
+        { transform: `translateY(-100vh) translateX(${drift}px)`, opacity: 0 }
+      ], {
+        duration: duration * 1000,
+        easing: 'ease-out'
+      }).onfinish = () => particle.remove();
+    }
+
+    setInterval(createParticle, 500);
+  </script>
+</body>
+</html>

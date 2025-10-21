@@ -451,12 +451,28 @@
         <div class="action-desc">Track member check-ins and check-outs</div>
       </a>
 
-      <a href="{{ url_for('view_trainers') }}" class="action-card">
+      <a href="{{ url_for('admin_payments') }}" class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-credit-card"></i>
+        </div>
+        <div class="action-title">Payments</div>
+        <div class="action-desc">Manage payments and billing</div>
+      </a>
+
+      <a href="{{ url_for('admin_classes') }}" class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-running"></i>
+        </div>
+        <div class="action-title">Classes</div>
+        <div class="action-desc">Manage fitness classes</div>
+      </a>
+
+      <a href="{{ url_for('admin_equipment') }}" class="action-card">
         <div class="action-icon">
           <i class="fas fa-dumbbell"></i>
         </div>
-        <div class="action-title">Trainers</div>
-        <div class="action-desc">Manage gym trainers and staff</div>
+        <div class="action-title">Equipment</div>
+        <div class="action-desc">Manage gym equipment</div>
       </a>
     </div>
   </div>

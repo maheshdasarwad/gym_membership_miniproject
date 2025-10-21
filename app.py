@@ -348,6 +348,139 @@ def cancel(member_id):
     flash('Membership cancelled successfully!', 'success')
     return redirect(url_for('admin_members'))
 
+@app.route('/admin/payments')
+@login_required
+def admin_payments():
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    
+    # Get payment statistics
+    cursor.execute("SELECT COUNT(*) as total_payments FROM payments")
+    total_payments = cursor.fetchone()['total_payments']
+    
+    cursor.execute("SELECT SUM(amount) as total_revenue FROM payments WHERE payment_status = 'completed'")
+    total_revenue = cursor.fetchone()['total_revenue'] or 0
+    
+    cursor.execute("SELECT SUM(amount) as monthly_revenue FROM payments WHERE payment_status = 'completed' AND MONTH(payment_date) = MONTH(CURDATE())")
+    monthly_revenue = cursor.fetchone()['monthly_revenue'] or 0
+    
+    # Get recent payments
+    cursor.execute("""
+        SELECT p.*, m.name as member_name, m.membership_plan
+        FROM payments p
+        JOIN members m ON p.member_id = m.member_id
+        ORDER BY p.payment_date DESC
+        LIMIT 50
+    """)
+    recent_payments = cursor.fetchall()
+    
+    cursor.close()
+    db.close()
+    
+    return render_template('admin_payments.html', 
+                         total_payments=total_payments,
+                         total_revenue=total_revenue,
+                         monthly_revenue=monthly_revenue,
+                         recent_payments=recent_payments)
+
+@app.route('/admin/add_payment', methods=['GET', 'POST'])
+@login_required
+def admin_add_payment():
+    if request.method == 'POST':
+        data = request.form
+        member_id = int(data['member_id'])
+        amount = float(data['amount'])
+        payment_type = data['payment_type']
+        payment_method = data['payment_method']
+        payment_status = data['payment_status']
+        notes = data.get('notes', '')
+        
+        db = get_db_connection()
+        cursor = db.cursor()
+        
+        # Insert payment record
+        sql = """INSERT INTO payments 
+                 (member_id, amount, payment_type, payment_method, payment_status, notes, created_by)
+                 VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+        val = (member_id, amount, payment_type, payment_method, payment_status, notes, session['admin_id'])
+        cursor.execute(sql, val)
+        db.commit()
+        cursor.close()
+        db.close()
+        
+        flash('Payment added successfully!', 'success')
+        return redirect(url_for('admin_payments'))
+    
+    # Get active members for dropdown
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT member_id, name, membership_plan FROM members WHERE status = 'active' ORDER BY name")
+    members = cursor.fetchall()
+    cursor.close()
+    db.close()
+    
+    return render_template('admin_add_payment.html', members=members)
+
+@app.route('/admin/classes')
+@login_required
+def admin_classes():
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    
+    # Get classes with trainer information
+    cursor.execute("""
+        SELECT c.*, t.name as trainer_name
+        FROM classes c
+        LEFT JOIN trainers t ON c.trainer_id = t.trainer_id
+        ORDER BY c.class_name
+    """)
+    classes = cursor.fetchall()
+    
+    # Get upcoming class schedules
+    cursor.execute("""
+        SELECT cs.*, c.class_name, t.name as trainer_name
+        FROM class_schedules cs
+        JOIN classes c ON cs.class_id = c.class_id
+        LEFT JOIN trainers t ON c.trainer_id = t.trainer_id
+        WHERE cs.schedule_date >= CURDATE() AND cs.is_cancelled = FALSE
+        ORDER BY cs.schedule_date, cs.start_time
+    """)
+    upcoming_schedules = cursor.fetchall()
+    
+    cursor.close()
+    db.close()
+    
+    return render_template('admin_classes.html', classes=classes, upcoming_schedules=upcoming_schedules)
+
+@app.route('/admin/equipment')
+@login_required
+def admin_equipment():
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    
+    # Get equipment list
+    cursor.execute("SELECT * FROM equipment ORDER BY equipment_name")
+    equipment = cursor.fetchall()
+    
+    # Get equipment statistics
+    cursor.execute("SELECT COUNT(*) as total_equipment FROM equipment")
+    total_equipment = cursor.fetchone()['total_equipment']
+    
+    cursor.execute("SELECT COUNT(*) as active_equipment FROM equipment WHERE status = 'active'")
+    active_equipment = cursor.fetchone()['active_equipment']
+    
+    cursor.execute("SELECT COUNT(*) as maintenance_due FROM equipment WHERE next_maintenance <= CURDATE()")
+    maintenance_due = cursor.fetchone()['maintenance_due']
+    
+    cursor.close()
+    db.close()
+    
+    return render_template('admin_equipment.html', 
+                         equipment=equipment,
+                         total_equipment=total_equipment,
+                         active_equipment=active_equipment,
+                         maintenance_due=maintenance_due)
+
 @app.route('/view_trainers')
 def view_trainers():
     trainers = get_trainers()

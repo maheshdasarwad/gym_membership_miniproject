@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipment Management - MKC Fitness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .equipment-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .equipment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .equipment-title h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .equipment-title p {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+
+    .back-btn {
+      padding: 1rem 2rem;
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background: var(--primary);
+      color: var(--dark);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card {
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .stat-card:hover::before {
+      left: 100%;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 40px rgba(0, 255, 136, 0.2);
+    }
+
+    .stat-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-dim);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .equipment-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .equipment-card {
+      background: var(--dark-card);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .equipment-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .equipment-card:hover::before {
+      left: 100%;
+    }
+
+    .equipment-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 40px rgba(0, 255, 136, 0.2);
+    }
+
+    .equipment-header-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .equipment-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .equipment-category {
+      color: var(--primary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .equipment-status {
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-active {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .status-maintenance {
+      background: rgba(255, 165, 2, 0.2);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+    }
+
+    .status-out_of_order {
+      background: rgba(255, 71, 87, 0.2);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .status-retired {
+      background: rgba(160, 160, 160, 0.2);
+      color: var(--text-dim);
+      border: 1px solid var(--text-dim);
+    }
+
+    .equipment-details {
+      margin-bottom: 1.5rem;
+    }
+
+    .equipment-detail {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .equipment-detail-label {
+      color: var(--text-dim);
+    }
+
+    .equipment-detail-value {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .equipment-location {
+      background: rgba(0, 255, 136, 0.1);
+      padding: 0.8rem;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .equipment-location-label {
+      color: var(--primary);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.25rem;
+    }
+
+    .equipment-location-value {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .maintenance-info {
+      background: rgba(255, 165, 2, 0.1);
+      padding: 0.8rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 165, 2, 0.2);
+    }
+
+    .maintenance-label {
+      color: var(--warning);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.25rem;
+    }
+
+    .maintenance-value {
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--text-dim);
+      grid-column: 1 / -1;
+    }
+
+    .empty-state-icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    @media (max-width: 768px) {
+      .equipment-container {
+        padding: 1rem;
+      }
+
+      .equipment-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+
+      .equipment-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+
+  <div class="equipment-container">
+    <div class="equipment-header">
+      <div class="equipment-title">
+        <h1>🏋️ Equipment Management</h1>
+        <p>Track and manage gym equipment</p>
+      </div>
+      <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Dashboard</a>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🏋️</div>
+        <div class="stat-number">{{ total_equipment }}</div>
+        <div class="stat-label">Total Equipment</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-number">{{ active_equipment }}</div>
+        <div class="stat-label">Active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔧</div>
+        <div class="stat-number">{{ maintenance_due }}</div>
+        <div class="stat-label">Maintenance Due</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-number" id="maintenanceRate">0%</div>
+        <div class="stat-label">Maintenance Rate</div>
+      </div>
+    </div>
+
+    <div class="equipment-grid">
+      {% if equipment %}
+        {% for item in equipment %}
+        <div class="equipment-card">
+          <div class="equipment-header-card">
+            <div>
+              <div class="equipment-name">{{ item.equipment_name }}</div>
+              <div class="equipment-category">{{ item.category or 'General' }}</div>
+            </div>
+            <div class="equipment-status status-{{ item.status }}">{{ item.status.replace('_', ' ').title() }}</div>
+          </div>
+
+          <div class="equipment-details">
+            {% if item.brand %}
+            <div class="equipment-detail">
+              <span class="equipment-detail-label">Brand:</span>
+              <span class="equipment-detail-value">{{ item.brand }}</span>
+            </div>
+            {% endif %}
+
+            {% if item.model %}
+            <div class="equipment-detail">
+              <span class="equipment-detail-label">Model:</span>
+              <span class="equipment-detail-value">{{ item.model }}</span>
+            </div>
+            {% endif %}
+
+            {% if item.serial_number %}
+            <div class="equipment-detail">
+              <span class="equipment-detail-label">Serial:</span>
+              <span class="equipment-detail-value">{{ item.serial_number }}</span>
+            </div>
+            {% endif %}
+
+            {% if item.purchase_date %}
+            <div class="equipment-detail">
+              <span class="equipment-detail-label">Purchased:</span>
+              <span class="equipment-detail-value">{{ item.purchase_date }}</span>
+            </div>
+            {% endif %}
+
+            {% if item.purchase_price %}
+            <div class="equipment-detail">
+              <span class="equipment-detail-label">Price:</span>
+              <span class="equipment-detail-value">₹{{ item.purchase_price }}</span>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if item.location %}
+          <div class="equipment-location">
+            <div class="equipment-location-label">Location</div>
+            <div class="equipment-location-value">{{ item.location }}</div>
+          </div>
+          {% endif %}
+
+          {% if item.next_maintenance %}
+          <div class="maintenance-info">
+            <div class="maintenance-label">Next Maintenance</div>
+            <div class="maintenance-value">{{ item.next_maintenance }}</div>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-state-icon">🏋️</div>
+          <h3>No Equipment Found</h3>
+          <p>No equipment has been added to the system yet.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    // Calculate maintenance rate
+    function calculateMaintenanceRate() {
+      const totalEquipment = {{ total_equipment }};
+      const maintenanceDue = {{ maintenance_due }};
+      const rate = totalEquipment > 0 ? Math.round((maintenanceDue / totalEquipment) * 100) : 0;
+      document.getElementById('maintenanceRate').textContent = rate + '%';
+    }
+
+    window.addEventListener('load', calculateMaintenanceRate);
+
+    // Add floating particles
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.style.position = 'fixed';
+      particle.style.width = Math.random() * 4 + 2 + 'px';
+      particle.style.height = particle.style.width;
+      particle.style.background = 'var(--primary)';
+      particle.style.borderRadius = '50%';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = '100%';
+      particle.style.opacity = '0.3';
+      particle.style.pointerEvents = 'none';
+      particle.style.zIndex = '1';
+      document.body.appendChild(particle);
+
+      const duration = Math.random() * 3 + 3;
+      const drift = (Math.random() - 0.5) * 100;
+
+      particle.animate([
+        { transform: 'translateY(0) translateX(0)', opacity: 0.3 },
+        { transform: `translateY(-100vh) translateX(${drift}px)`, opacity: 0 }
+      ], {
+        duration: duration * 1000,
+        easing: 'ease-out'
+      }).onfinish = () => particle.remove();
+    }
+
+    setInterval(createParticle, 600);
+  </script>
+</body>
+</html>

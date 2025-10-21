@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class Management - MKC Fitness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .classes-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .classes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .classes-title h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .classes-title p {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+
+    .back-btn {
+      padding: 1rem 2rem;
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background: var(--primary);
+      color: var(--dark);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .content-card {
+      background: var(--dark-card);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      overflow: hidden;
+    }
+
+    .content-header {
+      background: rgba(0, 255, 136, 0.1);
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .content-header h3 {
+      color: var(--primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .content-body {
+      padding: 1.5rem;
+    }
+
+    .class-item, .schedule-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .class-item:last-child, .schedule-item:last-child {
+      border-bottom: none;
+    }
+
+    .class-info, .schedule-info {
+      flex: 1;
+    }
+
+    .class-name, .schedule-class {
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .class-trainer, .schedule-trainer {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .class-capacity, .schedule-time {
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .class-price {
+      color: var(--secondary);
+      font-weight: 700;
+    }
+
+    .schedule-date {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-active {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .status-upcoming {
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--secondary);
+      border: 1px solid var(--secondary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-dim);
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    @media (max-width: 768px) {
+      .classes-container {
+        padding: 1rem;
+      }
+
+      .classes-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+
+  <div class="classes-container">
+    <div class="classes-header">
+      <div class="classes-title">
+        <h1>🏃 Class Management</h1>
+        <p>Manage fitness classes and schedules</p>
+      </div>
+      <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Dashboard</a>
+    </div>
+
+    <div class="content-grid">
+      <div class="content-card">
+        <div class="content-header">
+          <h3>Available Classes</h3>
+        </div>
+        <div class="content-body">
+          {% if classes %}
+            {% for class in classes %}
+            <div class="class-item">
+              <div class="class-info">
+                <div class="class-name">{{ class.class_name }}</div>
+                <div class="class-trainer">{{ class.trainer_name or 'No trainer assigned' }}</div>
+              </div>
+              <div class="class-capacity">{{ class.max_capacity }} spots</div>
+              <div class="class-price">₹{{ class.price }}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-state-icon">🏃</div>
+              <h3>No Classes Available</h3>
+              <p>No fitness classes have been set up yet.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="content-header">
+          <h3>Upcoming Schedules</h3>
+        </div>
+        <div class="content-body">
+          {% if upcoming_schedules %}
+            {% for schedule in upcoming_schedules %}
+            <div class="schedule-item">
+              <div class="schedule-info">
+                <div class="schedule-class">{{ schedule.class_name }}</div>
+                <div class="schedule-trainer">{{ schedule.trainer_name or 'No trainer' }}</div>
+                <div class="schedule-date">{{ schedule.schedule_date }} at {{ schedule.start_time }}</div>
+              </div>
+              <div class="status-badge status-upcoming">Upcoming</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-state-icon">📅</div>
+              <h3>No Upcoming Classes</h3>
+              <p>No classes are scheduled for the upcoming days.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Add floating particles
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.style.position = 'fixed';
+      particle.style.width = Math.random() * 4 + 2 + 'px';
+      particle.style.height = particle.style.width;
+      particle.style.background = 'var(--primary)';
+      particle.style.borderRadius = '50%';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = '100%';
+      particle.style.opacity = '0.3';
+      particle.style.pointerEvents = 'none';
+      particle.style.zIndex = '1';
+      document.body.appendChild(particle);
+
+      const duration = Math.random() * 3 + 3;
+      const drift = (Math.random() - 0.5) * 100;
+
+      particle.animate([
+        { transform: 'translateY(0) translateX(0)', opacity: 0.3 },
+        { transform: `translateY(-100vh) translateX(${drift}px)`, opacity: 0 }
+      ], {
+        duration: duration * 1000,
+        easing: 'ease-out'
+      }).onfinish = () => particle.remove();
+    }
+
+    setInterval(createParticle, 600);
+  </script>
+</body>
+</html>

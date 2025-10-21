@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Management - MKC Fitness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .attendance-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .attendance-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .attendance-title h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .attendance-title p {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+
+    .back-btn {
+      padding: 1rem 2rem;
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background: var(--primary);
+      color: var(--dark);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card {
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .stat-card:hover::before {
+      left: 100%;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 40px rgba(0, 255, 136, 0.2);
+    }
+
+    .stat-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-dim);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .checkin-section {
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      margin-bottom: 3rem;
+    }
+
+    .checkin-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .checkin-form {
+      display: flex;
+      gap: 1rem;
+      align-items: end;
+    }
+
+    .form-group {
+      flex: 1;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: var(--dark-alt);
+      border: 2px solid rgba(0, 255, 136, 0.2);
+      border-radius: 15px;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+
+    .checkin-btn, .checkout-btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 15px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .checkin-btn {
+      background: var(--gradient);
+      color: var(--dark);
+    }
+
+    .checkin-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
+    }
+
+    .checkout-btn {
+      background: linear-gradient(135deg, #bd00ff, #ff6b00);
+      color: var(--text);
+    }
+
+    .checkout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(189, 0, 255, 0.5);
+    }
+
+    .attendance-table {
+      background: var(--dark-card);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: rgba(0, 255, 136, 0.1);
+    }
+
+    th {
+      padding: 1.5rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+      color: var(--primary);
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(0, 255, 136, 0.05);
+    }
+
+    td {
+      padding: 1.5rem 1rem;
+      color: var(--text-dim);
+    }
+
+    .member-name {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .checkin-time, .checkout-time {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+
+    .duration {
+      font-weight: 700;
+      color: var(--secondary);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-checked-in {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .status-checked-out {
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--secondary);
+      border: 1px solid var(--secondary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--text-dim);
+    }
+
+    .empty-state-icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .alert {
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .alert-success {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .alert-error {
+      background: rgba(255, 71, 87, 0.2);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    @media (max-width: 768px) {
+      .attendance-container {
+        padding: 1rem;
+      }
+
+      .attendance-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+
+      .checkin-form {
+        flex-direction: column;
+      }
+
+      .attendance-table {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 800px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+
+  <div class="attendance-container">
+    <div class="attendance-header">
+      <div class="attendance-title">
+        <h1>📊 Attendance Management</h1>
+        <p>Track member check-ins and check-outs</p>
+      </div>
+      <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Dashboard</a>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-number">{{ total_checkins }}</div>
+        <div class="stat-label">Today's Check-ins</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-number">{{ unique_members }}</div>
+        <div class="stat-label">Unique Members</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-number" id="avgDuration">0</div>
+        <div class="stat-label">Avg Duration (min)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏃</div>
+        <div class="stat-number" id="activeNow">0</div>
+        <div class="stat-label">Currently Active</div>
+      </div>
+    </div>
+
+    <div class="checkin-section">
+      <div class="checkin-title">
+        <span>🔑</span>
+        Quick Check-in/Check-out
+      </div>
+      
+      <div class="alert alert-success" id="successAlert"></div>
+      <div class="alert alert-error" id="errorAlert"></div>
+
+      <div class="checkin-form">
+        <div class="form-group">
+          <label for="memberIdInput">Member ID</label>
+          <input type="text" id="memberIdInput" placeholder="Enter member ID">
+        </div>
+        <button type="button" class="checkin-btn" onclick="checkIn()">Check In</button>
+        <button type="button" class="checkout-btn" onclick="checkOut()">Check Out</button>
+      </div>
+    </div>
+
+    <div class="attendance-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Plan</th>
+            <th>Check-in Time</th>
+            <th>Check-out Time</th>
+            <th>Duration</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceTable">
+          {% if today_attendance %}
+            {% for attendance in today_attendance %}
+            <tr>
+              <td class="member-name">{{ attendance.member_name }}</td>
+              <td>{{ attendance.membership_plan }}</td>
+              <td class="checkin-time">{{ attendance.check_in_time.strftime('%H:%M:%S') }}</td>
+              <td class="checkout-time">
+                {% if attendance.check_out_time %}
+                  {{ attendance.check_out_time.strftime('%H:%M:%S') }}
+                {% else %}
+                  <span style="color: var(--warning);">Still Active</span>
+                {% endif %}
+              </td>
+              <td class="duration">
+                {% if attendance.duration_minutes %}
+                  {{ attendance.duration_minutes }} min
+                {% else %}
+                  <span style="color: var(--warning);">In Progress</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="status-badge {{ 'status-checked-out' if attendance.check_out_time else 'status-checked-in' }}">
+                  {{ 'Checked Out' if attendance.check_out_time else 'Checked In' }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="6">
+                <div class="empty-state">
+                  <div class="empty-state-icon">📊</div>
+                  <h3>No Attendance Today</h3>
+                  <p>No members have checked in today yet.</p>
+                </div>
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function showAlert(message, type) {
+      const alert = document.getElementById(type + 'Alert');
+      alert.textContent = message;
+      alert.style.display = 'block';
+      setTimeout(() => {
+        alert.style.display = 'none';
+      }, 5000);
+    }
+
+    async function checkIn() {
+      const memberId = document.getElementById('memberIdInput').value.trim();
+      if (!memberId) {
+        showAlert('Please enter a member ID', 'error');
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('member_id', memberId);
+
+        const response = await fetch('{{ url_for("admin_checkin") }}', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          showAlert(result.message, 'success');
+          document.getElementById('memberIdInput').value = '';
+          // Refresh the page to show updated attendance
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showAlert(result.message, 'error');
+        }
+      } catch (error) {
+        showAlert('An error occurred. Please try again.', 'error');
+      }
+    }
+
+    async function checkOut() {
+      const memberId = document.getElementById('memberIdInput').value.trim();
+      if (!memberId) {
+        showAlert('Please enter a member ID', 'error');
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('member_id', memberId);
+
+        const response = await fetch('{{ url_for("admin_checkout") }}', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          showAlert(result.message, 'success');
+          document.getElementById('memberIdInput').value = '';
+          // Refresh the page to show updated attendance
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showAlert(result.message, 'error');
+        }
+      } catch (error) {
+        showAlert('An error occurred. Please try again.', 'error');
+      }
+    }
+
+    // Calculate statistics
+    function calculateStats() {
+      const rows = document.querySelectorAll('#attendanceTable tr');
+      let totalDuration = 0;
+      let completedSessions = 0;
+      let activeNow = 0;
+
+      rows.forEach(row => {
+        if (row.querySelector('.empty-state')) return;
+        
+        const durationCell = row.querySelector('.duration');
+        const statusCell = row.querySelector('.status-badge');
+        
+        if (durationCell && statusCell) {
+          const durationText = durationCell.textContent.trim();
+          const statusText = statusCell.textContent.trim();
+          
+          if (durationText.includes('min') && !durationText.includes('Progress')) {
+            const duration = parseInt(durationText);
+            totalDuration += duration;
+            completedSessions++;
+          }
+          
+          if (statusText === 'Checked In') {
+            activeNow++;
+          }
+        }
+      });
+
+      const avgDuration = completedSessions > 0 ? Math.round(totalDuration / completedSessions) : 0;
+      document.getElementById('avgDuration').textContent = avgDuration;
+      document.getElementById('activeNow').textContent = activeNow;
+    }
+
+    // Allow Enter key to trigger check-in
+    document.getElementById('memberIdInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkIn();
+      }
+    });
+
+    // Calculate stats on load
+    window.addEventListener('load', calculateStats);
+
+    // Add floating particles
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.style.position = 'fixed';
+      particle.style.width = Math.random() * 4 + 2 + 'px';
+      particle.style.height = particle.style.width;
+      particle.style.background = 'var(--primary)';
+      particle.style.borderRadius = '50%';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = '100%';
+      particle.style.opacity = '0.3';
+      particle.style.pointerEvents = 'none';
+      particle.style.zIndex = '1';
+      document.body.appendChild(particle);
+
+      const duration = Math.random() * 3 + 3;
+      const drift = (Math.random() - 0.5) * 100;
+
+      particle.animate([
+        { transform: 'translateY(0) translateX(0)', opacity: 0.3 },
+        { transform: `translateY(-100vh) translateX(${drift}px)`, opacity: 0 }
+      ], {
+        duration: duration * 1000,
+        easing: 'ease-out'
+      }).onfinish = () => particle.remove();
+    }
+
+    setInterval(createParticle, 600);
+  </script>
+</body>
+</html>
