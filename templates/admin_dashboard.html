@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - MKC Fitness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <style>
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .dashboard-title h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .dashboard-title p {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--dark-card);
+      padding: 1rem 1.5rem;
+      border-radius: 15px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      background: var(--gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--dark);
+    }
+
+    .user-details h3 {
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    .user-details p {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .logout-btn {
+      background: transparent;
+      color: var(--danger);
+      border: 2px solid var(--danger);
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: var(--danger);
+      color: var(--dark);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card {
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .stat-card:hover::before {
+      left: 100%;
+    }
+
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      background: var(--gradient);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-dim);
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .content-card {
+      background: var(--dark-card);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      overflow: hidden;
+    }
+
+    .content-header {
+      background: rgba(0, 255, 136, 0.1);
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .content-header h3 {
+      color: var(--primary);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .content-header p {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .content-body {
+      padding: 1.5rem;
+    }
+
+    .member-item, .class-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--dark-alt);
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .member-item:hover, .class-item:hover {
+      background: rgba(0, 255, 136, 0.05);
+      transform: translateX(5px);
+    }
+
+    .member-avatar, .class-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--dark);
+    }
+
+    .member-info, .class-info {
+      flex: 1;
+    }
+
+    .member-name, .class-name {
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .member-plan, .class-time {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .action-card {
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      text-align: center;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .action-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+    }
+
+    .action-icon {
+      width: 60px;
+      height: 60px;
+      background: var(--gradient);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 1rem;
+      color: var(--dark);
+    }
+
+    .action-title {
+      color: var(--text);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .action-desc {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-dim);
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-container {
+        padding: 1rem;
+      }
+
+      .dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <div class="dashboard-title">
+        <h1>📊 Admin Dashboard</h1>
+        <p>Welcome back, {{ session.admin_name }}! Here's what's happening at MKC Fitness.</p>
+      </div>
+      <div class="user-info">
+        <div class="user-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="user-details">
+          <h3>{{ session.admin_name }}</h3>
+          <p>{{ session.admin_role.replace('_', ' ').title() }}</p>
+        </div>
+        <a href="{{ url_for('admin_logout') }}" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-value">{{ total_members }}</div>
+        <div class="stat-label">Active Members</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-dumbbell"></i>
+        </div>
+        <div class="stat-value">{{ total_trainers }}</div>
+        <div class="stat-label">Trainers</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="stat-value">{{ today_attendance }}</div>
+        <div class="stat-label">Today's Check-ins</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-rupee-sign"></i>
+        </div>
+        <div class="stat-value">₹{{ "%.0f"|format(monthly_revenue) }}</div>
+        <div class="stat-label">Monthly Revenue</div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <div class="content-card">
+        <div class="content-header">
+          <h3><i class="fas fa-user-plus"></i> Recent Members</h3>
+          <p>Latest members who joined the gym</p>
+        </div>
+        <div class="content-body">
+          {% if recent_members %}
+            {% for member in recent_members %}
+            <div class="member-item">
+              <div class="member-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="member-info">
+                <div class="member-name">{{ member.name }}</div>
+                <div class="member-plan">{{ member.membership_plan }} • Joined {{ member.created_at.strftime('%b %d') }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-icon">👥</div>
+              <p>No recent members</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="content-header">
+          <h3><i class="fas fa-calendar-alt"></i> Upcoming Classes</h3>
+          <p>Classes scheduled for today and tomorrow</p>
+        </div>
+        <div class="content-body">
+          {% if upcoming_classes %}
+            {% for class in upcoming_classes %}
+            <div class="class-item">
+              <div class="class-icon">
+                <i class="fas fa-dumbbell"></i>
+              </div>
+              <div class="class-info">
+                <div class="class-name">{{ class.class_name }}</div>
+                <div class="class-time">{{ class.schedule_date.strftime('%b %d') }} at {{ class.start_time.strftime('%H:%M') }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-icon">📅</div>
+              <p>No upcoming classes</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <a href="{{ url_for('admin_members') }}" class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="action-title">Manage Members</div>
+        <div class="action-desc">View, add, and manage gym members</div>
+      </a>
+
+      <a href="{{ url_for('admin_add_member') }}" class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <div class="action-title">Add Member</div>
+        <div class="action-desc">Register new gym members</div>
+      </a>
+
+      <a href="{{ url_for('admin_attendance') }}" class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="action-title">Attendance</div>
+        <div class="action-desc">Track member check-ins and check-outs</div>
+      </a>
+
+      <a href="{{ url_for('view_trainers') }}" class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-dumbbell"></i>
+        </div>
+        <div class="action-title">Trainers</div>
+        <div class="action-desc">Manage gym trainers and staff</div>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Auto-refresh dashboard every 5 minutes
+    setInterval(() => {
+      location.reload();
+    }, 300000);
+
+    // Add floating particles
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.style.position = 'fixed';
+      particle.style.width = Math.random() * 4 + 2 + 'px';
+      particle.style.height = particle.style.width;
+      particle.style.background = 'var(--primary)';
+      particle.style.borderRadius = '50%';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = '100%';
+      particle.style.opacity = '0.3';
+      particle.style.pointerEvents = 'none';
+      particle.style.zIndex = '1';
+      document.body.appendChild(particle);
+
+      const duration = Math.random() * 3 + 3;
+      const drift = (Math.random() - 0.5) * 100;
+
+      particle.animate([
+        { transform: 'translateY(0) translateX(0)', opacity: 0.3 },
+        { transform: `translateY(-100vh) translateX(${drift}px)`, opacity: 0 }
+      ], {
+        duration: duration * 1000,
+        easing: 'ease-out'
+      }).onfinish = () => particle.remove();
+    }
+
+    setInterval(createParticle, 800);
+  </script>
+</body>
+</html>

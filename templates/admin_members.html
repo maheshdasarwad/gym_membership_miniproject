@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Members - MKC Fitness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .members-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .members-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .members-title h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .members-title p {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .add-member-btn {
+      padding: 1rem 2rem;
+      background: var(--gradient);
+      color: var(--dark);
+      border: none;
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .add-member-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
+    }
+
+    .back-btn {
+      padding: 1rem 2rem;
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background: var(--primary);
+      color: var(--dark);
+    }
+
+    .search-filters {
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem;
+      background: var(--dark-alt);
+      border: 2px solid rgba(0, 255, 136, 0.2);
+      border-radius: 50px;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+
+    .search-box::before {
+      content: '🔍';
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+    }
+
+    .filter-select {
+      padding: 1rem 2rem;
+      background: var(--dark-alt);
+      border: 2px solid rgba(0, 255, 136, 0.2);
+      border-radius: 50px;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .filter-select:hover {
+      border-color: var(--primary);
+    }
+
+    .members-table {
+      background: var(--dark-card);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: rgba(0, 255, 136, 0.1);
+    }
+
+    th {
+      padding: 1.5rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+      color: var(--primary);
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(0, 255, 136, 0.05);
+      transform: scale(1.01);
+    }
+
+    td {
+      padding: 1.5rem 1rem;
+      color: var(--text-dim);
+    }
+
+    .member-name {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .member-plan {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 212, 255, 0.2));
+      color: var(--primary);
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+
+    .trainer-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .trainer-yes {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .trainer-no {
+      background: rgba(160, 160, 160, 0.2);
+      color: var(--text-dim);
+      border: 1px solid var(--text-dim);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-active {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .status-expired {
+      background: rgba(255, 71, 87, 0.2);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .status-suspended {
+      background: rgba(255, 165, 2, 0.2);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+    }
+
+    .status-cancelled {
+      background: rgba(160, 160, 160, 0.2);
+      color: var(--text-dim);
+      border: 1px solid var(--text-dim);
+    }
+
+    .amount {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 20px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-edit {
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--secondary);
+      border: 1px solid var(--secondary);
+    }
+
+    .btn-edit:hover {
+      background: var(--secondary);
+      color: var(--dark);
+    }
+
+    .btn-cancel {
+      background: rgba(255, 71, 87, 0.2);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .btn-cancel:hover {
+      background: var(--danger);
+      color: var(--dark);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--text-dim);
+    }
+
+    .empty-state-icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    @media (max-width: 768px) {
+      .members-container {
+        padding: 1rem;
+      }
+
+      .members-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+
+      .search-filters {
+        flex-direction: column;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+
+      .members-table {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 800px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+
+  <div class="members-container">
+    <div class="members-header">
+      <div class="members-title">
+        <h1>👥 Manage Members</h1>
+        <p>View and manage all gym members</p>
+      </div>
+      <div class="header-actions">
+        <a href="{{ url_for('admin_add_member') }}" class="add-member-btn">+ Add Member</a>
+        <a href="{{ url_for('admin_dashboard') }}" class="back-btn">← Dashboard</a>
+      </div>
+    </div>
+
+    <div class="search-filters">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search by name, email, or phone...">
+      </div>
+      <select class="filter-select" id="statusFilter">
+        <option value="">All Status</option>
+        <option value="active">Active</option>
+        <option value="expired">Expired</option>
+        <option value="suspended">Suspended</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <select class="filter-select" id="planFilter">
+        <option value="">All Plans</option>
+        <option value="1 Month">1 Month</option>
+        <option value="3 Months">3 Months</option>
+        <option value="6 Months">6 Months</option>
+        <option value="1 Year">1 Year</option>
+      </select>
+    </div>
+
+    <div class="members-table">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Plan</th>
+            <th>Trainer</th>
+            <th>Status</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Amount</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="membersTable">
+          {% if members %}
+            {% for member in members %}
+            <tr data-status="{{ member.status }}" data-plan="{{ member.membership_plan }}">
+              <td>#{{ member.member_id }}</td>
+              <td class="member-name">{{ member.name }}</td>
+              <td>
+                <div>{{ member.email or 'N/A' }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-dim);">{{ member.phone or 'N/A' }}</div>
+              </td>
+              <td><span class="member-plan">{{ member.membership_plan }}</span></td>
+              <td>
+                {% if member.trainer_required %}
+                  <span class="trainer-badge trainer-yes">{{ member.trainer_name or 'Assigned' }}</span>
+                {% else %}
+                  <span class="trainer-badge trainer-no">No</span>
+                {% endif %}
+              </td>
+              <td><span class="status-badge status-{{ member.status }}">{{ member.status.title() }}</span></td>
+              <td>{{ member.start_date }}</td>
+              <td>{{ member.end_date }}</td>
+              <td><span class="amount">₹{{ member.total_amount }}</span></td>
+              <td>
+                <div class="action-buttons">
+                  <a href="#" class="action-btn btn-edit">Edit</a>
+                  <a href="{{ url_for('cancel', member_id=member.member_id) }}" 
+                     class="action-btn btn-cancel" 
+                     onclick="return confirm('Are you sure you want to cancel this membership?');">
+                    Cancel
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="10">
+                <div class="empty-state">
+                  <div class="empty-state-icon">👥</div>
+                  <h3>No Members Found</h3>
+                  <p>Start adding members to see them here!</p>
+                </div>
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Search and filter functionality
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const planFilter = document.getElementById('planFilter');
+    const membersTable = document.getElementById('membersTable');
+
+    function filterTable() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const statusValue = statusFilter.value;
+      const planValue = planFilter.value;
+      const rows = membersTable.getElementsByTagName('tr');
+      let visibleRows = 0;
+
+      for (let row of rows) {
+        if (row.querySelector('.empty-state')) continue;
+        
+        const text = row.textContent.toLowerCase();
+        const status = row.dataset.status;
+        const plan = row.dataset.plan;
+        
+        const matchesSearch = text.includes(searchTerm);
+        const matchesStatus = !statusValue || status === statusValue;
+        const matchesPlan = !planValue || plan === planValue;
+        
+        if (matchesSearch && matchesStatus && matchesPlan) {
+          row.style.display = '';
+          visibleRows++;
+        } else {
+          row.style.display = 'none';
+        }
+      }
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+    planFilter.addEventListener('change', filterTable);
+
+    // Add floating particles
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.style.position = 'fixed';
+      particle.style.width = Math.random() * 4 + 2 + 'px';
+      particle.style.height = particle.style.width;
+      particle.style.background = 'var(--primary)';
+      particle.style.borderRadius = '50%';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = '100%';
+      particle.style.opacity = '0.3';
+      particle.style.pointerEvents = 'none';
+      particle.style.zIndex = '1';
+      document.body.appendChild(particle);
+
+      const duration = Math.random() * 3 + 3;
+      const drift = (Math.random() - 0.5) * 100;
+
+      particle.animate([
+        { transform: 'translateY(0) translateX(0)', opacity: 0.3 },
+        { transform: `translateY(-100vh) translateX(${drift}px)`, opacity: 0 }
+      ], {
+        duration: duration * 1000,
+        easing: 'ease-out'
+      }).onfinish = () => particle.remove();
+    }
+
+    setInterval(createParticle, 600);
+  </script>
+</body>
+</html>
