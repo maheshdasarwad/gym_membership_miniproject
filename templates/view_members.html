@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Members - MKC Fitness</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #00ff88;
+      --secondary: #00d4ff;
+      --dark: #0a0a0a;
+      --dark-alt: #1a1a1a;
+      --dark-card: #151515;
+      --text: #ffffff;
+      --text-dim: #a0a0a0;
+      --gradient: linear-gradient(135deg, #00ff88, #00d4ff);
+      --danger: #ff4757;
+      --warning: #ffa502;
+      --success: #00ff88;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated Background */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.08;
+      overflow: hidden;
+    }
+
+    .bg-animation::before,
+    .bg-animation::after {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: var(--gradient);
+      filter: blur(120px);
+      animation: float 25s infinite ease-in-out;
+    }
+
+    .bg-animation::before {
+      top: -300px;
+      right: -300px;
+    }
+
+    .bg-animation::after {
+      bottom: -300px;
+      left: -300px;
+      animation-delay: -12s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(150px, -100px) scale(1.2); }
+      66% { transform: translate(-100px, 150px) scale(0.8); }
+    }
+
+    /* HEADER */
+    header {
+      position: relative;
+      z-index: 10;
+      background: rgba(10, 10, 10, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+      padding: 2.5rem 5%;
+      text-align: center;
+      animation: slideDown 0.8s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 900;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      animation: glow 3s infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.5)); }
+      50% { filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.8)); }
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+      position: relative;
+      z-index: 10;
+      background: rgba(21, 21, 21, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem 5%;
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+      animation: fadeIn 1s ease;
+    }
+
+    .stat-item {
+      text-align: center;
+      animation: scaleIn 0.6s ease both;
+    }
+
+    .stat-item:nth-child(1) { animation-delay: 0.2s; }
+    .stat-item:nth-child(2) { animation-delay: 0.4s; }
+    .stat-item:nth-child(3) { animation-delay: 0.6s; }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--primary);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* CONTAINER */
+    .container {
+      position: relative;
+      z-index: 10;
+      max-width: 1400px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+      animation: fadeInUp 1s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* SEARCH & FILTER BAR */
+    .controls {
+      background: var(--dark-card);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem;
+      background: var(--dark-alt);
+      border: 2px solid rgba(0, 255, 136, 0.2);
+      border-radius: 50px;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+
+    .search-box::before {
+      content: '🔍';
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+    }
+
+    .filter-select {
+      padding: 1rem 2rem;
+      background: var(--dark-alt);
+      border: 2px solid rgba(0, 255, 136, 0.2);
+      border-radius: 50px;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .filter-select:hover {
+      border-color: var(--primary);
+    }
+
+    /* TABLE CONTAINER */
+    .table-container {
+      background: var(--dark-card);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: rgba(0, 255, 136, 0.1);
+    }
+
+    th {
+      padding: 1.5rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+      color: var(--primary);
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+      animation: fadeIn 0.5s ease both;
+    }
+
+    tbody tr:nth-child(1) { animation-delay: 0.1s; }
+    tbody tr:nth-child(2) { animation-delay: 0.15s; }
+    tbody tr:nth-child(3) { animation-delay: 0.2s; }
+    tbody tr:nth-child(4) { animation-delay: 0.25s; }
+    tbody tr:nth-child(5) { animation-delay: 0.3s; }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    tbody tr:hover {
+      background: rgba(0, 255, 136, 0.05);
+      transform: scale(1.01);
+    }
+
+    td {
+      padding: 1.5rem 1rem;
+      color: var(--text-dim);
+    }
+
+    td:first-child {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    td:nth-child(2) {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-yes {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .badge-no {
+      background: rgba(160, 160, 160, 0.2);
+      color: var(--text-dim);
+      border: 1px solid var(--text-dim);
+    }
+
+    .plan-badge {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 212, 255, 0.2));
+      color: var(--primary);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      font-weight: 700;
+    }
+
+    /* AMOUNT */
+    .amount {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* ACTION BUTTONS */
+    .action-btn {
+      padding: 0.7rem 1.5rem;
+      background: transparent;
+      color: var(--danger);
+      border: 2px solid var(--danger);
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 0.9rem;
+    }
+
+    .action-btn:hover {
+      background: var(--danger);
+      color: var(--dark);
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(255, 71, 87, 0.4);
+    }
+
+    /* BOTTOM ACTIONS */
+    .bottom-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-home {
+      padding: 1rem 2.5rem;
+      background: var(--gradient);
+      color: var(--dark);
+      border: none;
+      border-radius: 50px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .btn-home:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
+    }
+
+    .member-count {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--text-dim);
+    }
+
+    .empty-state-icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1200px) {
+      .table-container {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 900px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 1rem;
+        margin: 2rem auto;
+      }
+
+      header h1 {
+        font-size: 2rem;
+      }
+
+      .stats-bar {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+
+      th, td {
+        padding: 1rem 0.5rem;
+        font-size: 0.85rem;
+      }
+
+      .bottom-actions {
+        flex-direction: column;
+      }
+
+      .btn-home {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0, 255, 136, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Tooltip */
+    [data-tooltip] {
+      position: relative;
+      cursor: help;
+    }
+
+    [data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0.5rem 1rem;
+      background: var(--dark-alt);
+      color: var(--text);
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      z-index: 100;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-animation"></div>
+
+  <header>
+    <h1>💪 All Gym Members 💪</h1>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-number" id="totalMembers">{{ members|length }}</span>
+      <span class="stat-label">Total Members</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number" id="activeMembers">{{ members|length }}</span>
+      <span class="stat-label">Active</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">₹{{ members|sum(attribute='total_amount')|default(0) }}</span>
+      <span class="stat-label">Total Revenue</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="controls">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search by name, ID, or plan...">
+      </div>
+      <select class="filter-select" id="planFilter">
+        <option value="">All Plans</option>
+        <option value="1 Month">1 Month</option>
+        <option value="3 Months">3 Months</option>
+        <option value="6 Months">6 Months</option>
+        <option value="Year">1 Year</option>
+      </select>
+
+      <select class="filter-select" id="trainerFilter">
+        <option value="">All Members</option>
+        <option value="Yes">With Trainer</option>
+        <option value="No">Without Trainer</option>
+      </select>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Plan</th>
+            <th>Trainer</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Amount</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="memberTable">
+          {% if members %}
+            {% for m in members %}
+            <tr data-plan="{{ m.membership_plan }}" data-trainer="{{ 'Yes' if m.trainer_required else 'No' }}">
+              <td>#{{ m.member_id }}</td>
+              <td>{{ m.name }}</td>
+              <td><span class="badge plan-badge">{{ m.membership_plan }}</span></td>
+              <td>
+                <span class="badge {{ 'badge-yes' if m.trainer_required else 'badge-no' }}">
+                  {{ 'Yes' if m.trainer_required else 'No' }}
+                </span>
+              </td>
+              <td>{{ m.start_date }}</td>
+              <td>{{ m.end_date }}</td>
+              <td><span class="amount">₹{{ m.total_amount }}</span></td>
+              <td>
+                <a href="/cancel/{{ m.member_id }}" class="action-btn" onclick="return confirm('Are you sure you want to cancel this membership?');">
+                  ❌ Cancel
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8">
+                <div class="empty-state">
+                  <div class="empty-state-icon">🏋️</div>
+                  <h3>No Members Yet</h3>
+                  <p>Start adding members to see them here!</p>
+                </div>
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bottom-actions">
+      <span class="member-count">Showing <strong id="visibleCount">{{ members|length }}</strong> members</span>
+      <a href="/" class="btn-home">🏠 Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const planFilter = document.getElementById('planFilter');
+    const trainerFilter = document.getElementById('trainerFilter');
+    const memberTable = document.getElementById('memberTable');
+    const visibleCount = document.getElementById('visibleCount');
+
+    function filterTable() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const planValue = planFilter.value;
+      const trainerValue = trainerFilter.value;
+      const rows = memberTable.getElementsByTagName('tr');
+      let visibleRows = 0;
+
+      for (let row of rows) {
+        if (row.querySelector('.empty-state')) continue;
+        
+        const text = row.textContent.toLowerCase();
+        const plan = row.dataset.plan;
+        const trainer = row.dataset.trainer;
+        
+        const matchesSearch = text.includes(searchTerm);
+        const matchesPlan = !planValue || plan === planValue;
+        const matchesTrainer = !trainerValue || trainer === trainerValue;
+        
+        if (matchesSearch && matchesPlan && matchesTrainer) {
+          row.style.display = '';
+          visibleRows++;
+        } else {
+          row.style.display = 'none';
+        }
+      }
+
+      visibleCount.textContent = visibleRows;
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    planFilter.addEventListener('change', filterTable);
+    trainerFilter.addEventListener('change', filterTable);
+
+    // Floating particles
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.style.position = 'fixed';
+      particle.style.width = Math.random() * 4 + 2 + 'px';
+      particle.style.height = particle.style.width;
+      particle.style.background = 'var(--primary)';
+      particle.style.borderRadius = '50%';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = '100%';
+      particle.style.opacity = '0.3';
+      particle.style.pointerEvents = 'none';
+      particle.style.zIndex = '1';
+      document.body.appendChild(particle);
+
+      const duration = Math.random() * 3 + 3;
+      const drift = (Math.random() - 0.5) * 100;
+
+      particle.animate([
+        { transform: 'translateY(0) translateX(0)', opacity: 0.3 },
+        { transform: `translateY(-100vh) translateX(${drift}px)`, opacity: 0 }
+      ], {
+        duration: duration * 1000,
+        easing: 'ease-out'
+      }).onfinish = () => particle.remove();
+    }
+
+    setInterval(createParticle, 600);
+
+    // Animate stats on load
+    function animateStats() {
+      const statNumbers = document.querySelectorAll('.stat-number');
+      statNumbers.forEach(stat => {
+        const text = stat.textContent;
+        if (text.includes('₹')) return;
+        
+        const target = parseInt(text);
+        let current = 0;
+        const increment = target / 50;
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            stat.textContent = target;
+            clearInterval(timer);
+          } else {
+            stat.textContent = Math.floor(current);
+          }
+        }, 30);
+      });
+    }
+
+    window.addEventListener('load', animateStats);
+  </script>
+</body>
+</html>
